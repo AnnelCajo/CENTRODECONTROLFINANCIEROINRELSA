@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>INRELSA | Centro de Control y Logística</title>
+  <style>
+    /* PALETA CORPORATIVA ESTILO FORBES / INRELSA */
+    :root {
+      --primary-dark: #0d3880;
+      --primary-blue: #2382c7;
+      --card-bg: rgba(255, 255, 255, 0.98);
+      --text-main: #0f172a;
+      
+      /* BADGES */
+      --st-proceso-bg: #fef3c7; --st-proceso-txt: #b45309; /* PENDIENTE */
+      --st-terminado-bg: #dcfce7; --st-terminado-txt: #15803d;
+      --st-entregado-bg: #f3e8ff; --st-entregado-txt: #6b21a8;
+      --st-facturado-bg: #dbeafe; --st-facturado-txt: #1e40af;
+      --st-cobrado-bg: #fef9c3; --st-cobrado-txt: #854d0e;
+      --st-anulado-bg: #fee2e2; --st-anulado-txt: #991b1b;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      color: var(--text-main);
+      background-color: #081226;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #bg-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .app-container {
+      position: relative;
+      z-index: 1;
+      max-width: 1340px;
+      margin: 0 auto;
+      padding: 30px 20px 40px 20px;
+      flex: 1;
+      width: 100%;
+    }
+
+    #screenLanding {
+      text-align: center;
+      padding: 30px 10px;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .landing-title-box {
+      margin-bottom: 45px;
+    }
+
+    .landing-title-box h1 {
+      font-size: 2.2rem;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+      text-transform: uppercase;
+      margin: 0 0 10px 0;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+
+    .landing-title-box p {
+      color: #94a3b8;
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .polaroid-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      max-width: 1150px;
+      margin: 0 auto;
+    }
+
+    .polaroid-card {
+      background: #ffffff;
+      padding: 16px 16px 25px 16px;
+      border-radius: 16px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+    }
+
+    .polaroid-card:hover {
+      transform: translateY(-12px) rotate(1deg) scale(1.03);
+      box-shadow: 0 22px 45px rgba(35, 130, 199, 0.35);
+    }
+
+    .polaroid-photo {
+      width: 100%;
+      height: 170px;
+      background: linear-gradient(135deg, #0d3880 0%, #1e40af 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.6rem;
+      margin-bottom: 18px;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .polaroid-card h3 {
+      margin: 0 0 8px 0;
+      color: var(--primary-dark);
+      font-size: 1.2rem;
+      font-weight: 800;
+    }
+
+    .polaroid-card p {
+      margin: 0;
+      color: #64748b;
+      font-size: 0.86rem;
+      line-height: 1.4;
+    }
+
+    .polaroid-badge {
+      margin-top: 15px;
+      background: #eff6ff;
+      color: var(--primary-blue);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-weight: 800;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+    }
+
+    #screenModule {
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .top-bar-module {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .btn-back-menu {
+      background: rgba(255, 255, 255, 0.12);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      padding: 10px 20px;
+      border-radius: 25px;
+      font-weight: 800;
+      font-size: 0.88rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-back-menu:hover {
+      background: white;
+      color: var(--primary-dark);
+    }
+
+    .module-card {
+      background: var(--card-bg);
+      border-radius: 18px;
+      padding: 30px;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .form-group label {
+      font-weight: 700;
+      margin-bottom: 6px;
+      font-size: 0.8rem;
+      color: #334155;
+      text-transform: uppercase;
+    }
+
+    .form-group input, .form-group textarea, .form-group select {
+      padding: 11px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      background-color: #ffffff;
+    }
+
+    .autofill-hint {
+      font-size: 0.72rem;
+      color: var(--primary-blue);
+      font-weight: bold;
+      margin-top: 4px;
+      display: none;
+    }
+
+    .status-container {
+      grid-column: 1 / -1;
+      background: #f8fafc;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .status-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .status-btn-check { display: none; }
+
+    .status-label {
+      padding: 9px 18px;
+      background-color: #ffffff;
+      border: 2px solid #cbd5e1;
+      border-radius: 25px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #475569;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-btn-check:checked + .status-label {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-blue) 100%);
+      color: white;
+      border-color: var(--primary-dark);
+    }
+
+    .status-btn-check.anulado-check:checked + .status-label {
+      background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%);
+      color: white;
+      border-color: #991b1b;
+    }
+
+    .btn-action {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-blue) 100%);
+      color: white;
+      border: none;
+      padding: 14px 20px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      border-radius: 8px;
+      cursor: pointer;
+      text-transform: uppercase;
+      box-shadow: 0 4px 12px rgba(13, 56, 128, 0.25);
+    }
+
+    /* CONTADORES FINANCIEROS Y PROYECCIÓN (AHORA CON 6 TARJETAS) */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 25px;
+    }
+
+    .summary-card {
+      padding: 18px;
+      border-radius: 12px;
+      color: white;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .summary-card-real-soles { background: linear-gradient(135deg, #065f46 0%, #059669 100%); }
+    .summary-card-real-dolares { background: linear-gradient(135deg, #047857 0%, #10b981 100%); }
+    .summary-card-proy-soles { background: linear-gradient(135deg, #b45309 0%, #d97706 100%); }
+    .summary-card-proy-dolares { background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%); }
+    .summary-card-potencial { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); }
+    .summary-card-anulado { background: linear-gradient(135deg, #991b1b 0%, #ef4444 100%); } /* PERDIDO / ANULADO */
+
+    .summary-card-title {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      font-weight: 800;
+      opacity: 0.9;
+      margin-bottom: 6px;
+    }
+
+    .summary-card-val {
+      font-size: 1.4rem;
+      font-weight: 800;
+    }
+
+    .view-switches {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .btn-switch {
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 2px solid #cbd5e1;
+      background: white;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #475569;
+      cursor: pointer;
+    }
+
+    .btn-switch.active {
+      background: var(--primary-dark);
+      color: white;
+      border-color: var(--primary-dark);
+    }
+
+    .filter-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 18px;
+    }
+
+    .filter-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .search-input {
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: 2px solid #cbd5e1;
+      font-size: 0.9rem;
+      width: 100%;
+      max-width: 320px;
+    }
+
+    .select-month {
+      padding: 9px 16px;
+      font-size: 0.92rem;
+      font-weight: bold;
+      border-radius: 8px;
+      border: 2px solid var(--primary-blue);
+      color: var(--primary-dark);
+      background: white;
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+      max-height: 480px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      text-align: left;
+      background: white;
+    }
+
+    th {
+      background-color: var(--primary-dark);
+      color: white;
+      padding: 13px 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    td {
+      padding: 11px 14px;
+      border-bottom: 1px solid #f1f5f9;
+      color: #334155;
+      vertical-align: middle;
+    }
+
+    tr:hover { background-color: #f8fafc; }
+
+    tr.fila-anulada {
+      background-color: #fef2f2 !important;
+      opacity: 0.6;
+      text-decoration: line-through;
+    }
+
+    .badge-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .badge {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .badge-proceso { background: var(--st-proceso-bg); color: var(--st-proceso-txt); }
+    .badge-terminado { background: var(--st-terminado-bg); color: var(--st-terminado-txt); }
+    .badge-entregado { background: var(--st-entregado-bg); color: var(--st-entregado-txt); }
+    .badge-facturado { background: var(--st-facturado-bg); color: var(--st-facturado-txt); }
+    .badge-cobrado { background: var(--st-cobrado-bg); color: var(--st-cobrado-txt); }
+    .badge-anulado { background: var(--st-anulado-bg); color: var(--st-anulado-txt); }
+    .badge-default { background: #f1f5f9; color: #475569; }
+
+    .executive-footer {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 22px 20px;
+      color: #94a3b8;
+      font-size: 0.85rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(8, 18, 38, 0.85);
+      backdrop-filter: blur(8px);
+      margin-top: auto;
+    }
+
+    .executive-footer strong {
+      color: #e2e8f0;
+      font-weight: 700;
+    }
+
+    .footer-credits {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 4px;
+      font-size: 0.8rem;
+      color: #64748b;
+    }
+
+    .footer-dot {
+      width: 6px;
+      height: 6px;
+      background-color: var(--primary-blue);
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="bg-canvas"></canvas>
+
+  <div class="app-container">
+    
+    <div id="screenLanding">
+      <div class="landing-title-box">
+        <h1>BIENVENIDO AL CENTRO DE CONTROL Y LOGÍSTICA DE INRELSA</h1>
+        <p>Sistema de Inteligencia Comercial, Producción y Proyecciones Financieras</p>
+      </div>
+
+      <div class="polaroid-grid">
+        <div class="polaroid-card" onclick="abrirModulo('mod1')">
+          <div class="polaroid-photo">📝</div>
+          <h3>1. Ingresar Orden</h3>
+          <p>Registra nuevas cotizaciones y órdenes de trabajo en el sistema</p>
+          <div class="polaroid-badge">Acceder a Registro ➔</div>
+        </div>
+
+        <div class="polaroid-card" onclick="abrirModulo('mod2')">
+          <div class="polaroid-photo">🔄</div>
+          <h3>2. Cambiar Estado</h3>
+          <p>Actualiza la fase de avance, facturación o anulación de una OT</p>
+          <div class="polaroid-badge">Actualizar Estado ➔</div>
+        </div>
+
+        <div class="polaroid-card" onclick="abrirModulo('mod3')">
+          <div class="polaroid-photo">📋</div>
+          <h3>3. Resumen de OT</h3>
+          <p>Consulta el semáforo financiero, facturación real vs. proyección</p>
+          <div class="polaroid-badge">Ver Proyecciones ➔</div>
+        </div>
+
+        <div class="polaroid-card" onclick="abrirModulo('mod4')">
+          <div class="polaroid-photo">📊</div>
+          <h3>4. Resumen Ejecutivo</h3>
+          <p>Análisis acumulado de ventas y clientes atendidos por RUC</p>
+          <div class="polaroid-badge">Ver Comercial ➔</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="screenModule">
+      
+      <div class="top-bar-module">
+        <button class="btn-back-menu" onclick="volverAlMenu()">⬅️ Volver al Menú Principal</button>
+        <span id="moduleBreadcrumb" style="color:#94a3b8; font-weight:700; font-size:0.95rem;"></span>
+      </div>
+
+      <div id="mod1" class="module-content" style="display:none;">
+        <div class="module-card">
+          <h2 style="margin:0 0 20px 0; color:var(--primary-dark);">📝 Registrar Nueva Orden de Trabajo</h2>
+          <form id="salesForm">
+            <div class="form-grid">
+              <div class="form-group"><label>Fecha de Orden</label><input type="date" id="fecha" required></div>
+              <div class="form-group"><label>N° Cotización</label><input type="text" id="nroCotizacion" placeholder="Ej. ENE26-30567"></div>
+              
+              <div class="form-group">
+                <label>RUC Cliente</label>
+                <input type="text" id="ruc" placeholder="Ej. 20261677955" oninput="buscarAutocompletadoRuc(this.value)">
+                <span id="hintRuc" class="autofill-hint">✨ Cliente autocompletado</span>
+              </div>
+
+              <div class="form-group">
+                <label>Razón Social / Cliente</label>
+                <input type="text" id="razonSocial" list="listaClientes" placeholder="Nombre de la empresa" required oninput="buscarAutocompletadoCliente(this.value)">
+                <datalist id="listaClientes"></datalist>
+                <span id="hintCliente" class="autofill-hint">✨ RUC autocompletado</span>
+              </div>
+
+              <div class="form-group"><label>N° Orden</label><input type="text" id="nroOrden" placeholder="Ej. 11593"></div>
+              <div class="form-group"><label>Orden de Trabajo (OT)</label><input type="text" id="ot" placeholder="Ej. 7313" required></div>
+              <div class="form-group"><label>Cantidad</label><input type="text" id="cantidad" placeholder="Ej. 02 Pza."></div>
+              <div class="form-group"><label>Importe Neto (S/ PEN)</label><input type="number" step="0.01" id="importeSoles" placeholder="0.00"></div>
+              <div class="form-group"><label>Importe Neto ($ USD)</label><input type="number" step="0.01" id="importeDolares" placeholder="0.00"></div>
+              <div class="form-group" style="grid-column: 1 / -1;"><label>Descripción del Trabajo</label><textarea id="descripcion" rows="2" placeholder="Detalle del servicio..."></textarea></div>
+
+              <div class="status-container">
+                <span style="font-weight: 700; font-size: 0.85rem; color: var(--primary-dark);">Estado Inicial:</span>
+                <div class="status-options">
+                  <input type="checkbox" id="st1" class="status-btn-check estado-check" value="Pendiente" checked><label for="st1" class="status-label">⏳ Pendiente</label>
+                  <input type="checkbox" id="st2" class="status-btn-check estado-check" value="Terminado"><label for="st2" class="status-label">✅ Terminado</label>
+                  <input type="checkbox" id="st3" class="status-btn-check estado-check" value="Entregado"><label for="st3" class="status-label">📦 Entregado</label>
+                  <input type="checkbox" id="st4" class="status-btn-check estado-check" value="Facturado"><label for="st4" class="status-label">📄 Facturado</label>
+                  <input type="checkbox" id="st5" class="status-btn-check estado-check" value="Cobrado"><label for="st5" class="status-label">💰 Cobrado</label>
+                  <input type="checkbox" id="st6" class="status-btn-check estado-check anulado-check" value="Anulado"><label for="st6" class="status-label">🚫 Anulado</label>
+                </div>
+              </div>
+            </div>
+            <button type="submit" class="btn-action" id="btnGuardar" style="width: 100%; margin-top: 20px;">Guardar Nueva Venta en Excel</button>
+          </form>
+        </div>
+      </div>
+
+      <div id="mod2" class="module-content" style="display:none;">
+        <div class="module-card">
+          <h2 style="margin:0 0 10px 0; color:var(--primary-dark);">🔄 Cambiar Estado de una OT Existente</h2>
+          <p style="color:#64748b; margin-bottom:20px;">Ingresa el número de OT y selecciona los nuevos estados para actualizar el Excel.</p>
+          
+          <div class="form-group" style="margin-bottom: 20px;">
+            <label style="font-size: 0.88rem; color: var(--primary-dark);">Número de OT (Ejemplo: 7314):</label>
+            <input type="text" id="updateOtInput" placeholder="Escribe el N° de OT aquí..." style="font-weight: bold; border: 2px solid var(--primary-blue); font-size: 1.05rem;">
+          </div>
+
+          <div class="status-container" style="background: white;">
+            <span style="font-weight: 700; font-size: 0.85rem; color: var(--primary-dark);">Selecciona los nuevos estados:</span>
+            <div class="status-options">
+              <input type="checkbox" id="up_st1" class="status-btn-check update-check" value="Pendiente"><label for="up_st1" class="status-label">⏳ Pendiente</label>
+              <input type="checkbox" id="up_st2" class="status-btn-check update-check" value="Terminado"><label for="up_st2" class="status-label">✅ Terminado</label>
+              <input type="checkbox" id="up_st3" class="status-btn-check update-check" value="Entregado"><label for="up_st3" class="status-label">📦 Entregado</label>
+              <input type="checkbox" id="up_st4" class="status-btn-check update-check" value="Facturado"><label for="up_st4" class="status-label">📄 Facturado</label>
+              <input type="checkbox" id="up_st5" class="status-btn-check update-check" value="Cobrado"><label for="up_st5" class="status-label">💰 Cobrado</label>
+              <input type="checkbox" id="up_st6" class="status-btn-check update-check anulado-check" value="Anulado"><label for="up_st6" class="status-label">🚫 Anulado</label>
+            </div>
+          </div>
+
+          <button type="button" class="btn-action" id="btnActualizarOT" onclick="actualizarEstadoOT()" style="margin-top: 20px; width: 100%;">🔄 Guardar Cambio de Estado en Excel</button>
+        </div>
+      </div>
+
+      <div id="mod3" class="module-content" style="display:none;">
+        <div class="module-card">
+          <div class="filter-header">
+            <h2 style="margin: 0; color: var(--primary-dark);">📋 Detalle General de Órdenes y Proyecciones</h2>
+            
+            <div class="filter-controls">
+              <label style="font-weight: bold; font-size: 0.88rem; color: var(--primary-dark);">Filtrar por Mes:</label>
+              <select id="filtroMes" class="select-month" onchange="aplicarFiltros()">
+                <option value="TODOS">📅 Todo el Año 2026</option>
+                <option value="0">Enero</option><option value="1">Febrero</option><option value="2">Marzo</option>
+                <option value="3">Abril</option><option value="4">Mayo</option><option value="5">Junio</option>
+                <option value="6">Julio</option><option value="7">Agosto</option><option value="8">Septiembre</option>
+                <option value="9">Octubre</option><option value="10">Noviembre</option><option value="11">Diciembre</option>
+              </select>
+              <input type="text" id="buscarGeneral" class="search-input" placeholder="🔍 Buscar por RUC, OT, Cliente o Estado..." onkeyup="filtrarTablaGeneral()">
+            </div>
+          </div>
+
+          <!-- TARJETAS FINANCIERAS (INCLUYENDO TARJETA DE PÉRDIDAS POR ANULACIÓN) -->
+          <div class="summary-grid">
+            <div class="summary-card summary-card-real-soles">
+              <div class="summary-card-title">🟢 Facturado Real (S/ PEN)</div>
+              <div class="summary-card-val" id="stripRealSoles">S/ 0.00</div>
+            </div>
+
+            <div class="summary-card summary-card-real-dolares">
+              <div class="summary-card-title">🟢 Facturado Real ($ USD)</div>
+              <div class="summary-card-val" id="stripRealDolares">$ 0.00</div>
+            </div>
+
+            <div class="summary-card summary-card-proy-soles">
+              <div class="summary-card-title">🟡 Proyección Pendiente (S/ PEN)</div>
+              <div class="summary-card-val" id="stripProySoles">S/ 0.00</div>
+            </div>
+
+            <div class="summary-card summary-card-proy-dolares">
+              <div class="summary-card-title">🟡 Proyección Pendiente ($ USD)</div>
+              <div class="summary-card-val" id="stripProyDolares">$ 0.00</div>
+            </div>
+
+            <div class="summary-card summary-card-potencial">
+              <div class="summary-card-title">🔵 Potencial Total Mes</div>
+              <div class="summary-card-val" id="stripPotSoles" style="font-size:1.15rem;">S/ 0.00</div>
+              <div id="stripPotDolares" style="font-weight:bold; font-size:0.95rem; opacity:0.95;">$ 0.00 USD</div>
+              <small style="display:block; margin-top:4px; opacity:0.85;">OTs Activas: <span id="stripOtsActivas">0</span></small>
+            </div>
+
+            <div class="summary-card summary-card-anulado">
+              <div class="summary-card-title">🔴 Pérdida por Anulados</div>
+              <div class="summary-card-val" id="stripAnulSoles" style="font-size:1.15rem;">S/ 0.00</div>
+              <div id="stripAnulDolares" style="font-weight:bold; font-size:0.95rem; opacity:0.95;">$ 0.00 USD</div>
+              <small style="display:block; margin-top:4px; opacity:0.85;">OTs Anuladas: <span id="stripOtsAnuladas">0</span></small>
+            </div>
+          </div>
+
+          <div class="view-switches">
+            <span style="font-size:0.82rem; font-weight:bold; color:var(--primary-dark); align-self:center;">Filtrar Vista:</span>
+            <button class="btn-switch active" id="swAll" onclick="setVistaFiltro('ALL')">📊 Ver Todos</button>
+            <button class="btn-switch" id="swReal" onclick="setVistaFiltro('REAL')">🟢 Solo Facturados / Cobrados</button>
+            <button class="btn-switch" id="swProy" onclick="setVistaFiltro('PROY')">🟡 Solo Pendientes / Proyección</button>
+            <button class="btn-switch" id="swAnul" onclick="setVistaFiltro('ANUL')">🚫 Solo Anulados</button>
+          </div>
+
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Fecha</th><th>Cotización</th><th>RUC</th><th>Cliente / Razón Social</th>
+                  <th>OT</th><th>Descripción</th><th style="text-align: right;">Soles (S/.)</th>
+                  <th style="text-align: right;">Dólares ($)</th><th style="text-align: center;">Estado(s)</th>
+                </tr>
+              </thead>
+              <tbody id="tablaCuerpo">
+                <tr><td colspan="9" style="text-align: center;">Cargando base de datos...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="mod4" class="module-content" style="display:none;">
+        <div class="module-card">
+          <div class="filter-header">
+            <h2 style="margin: 0; color: var(--primary-dark);">📊 Resumen Ejecutivo Comercial por Cliente</h2>
+
+            <div class="filter-controls">
+              <label style="font-weight: bold; font-size: 0.88rem; color: var(--primary-dark);">Mes Comercial:</label>
+              <select id="filtroMesComercial" class="select-month" onchange="aplicarFiltrosComercial()">
+                <option value="TODOS">📅 Todo el Año 2026</option>
+                <option value="0">Enero</option><option value="1">Febrero</option><option value="2">Marzo</option>
+                <option value="3">Abril</option><option value="4">Mayo</option><option value="5">Junio</option>
+                <option value="6">Julio</option><option value="7">Agosto</option><option value="8">Septiembre</option>
+                <option value="9">Octubre</option><option value="10">Noviembre</option><option value="11">Diciembre</option>
+              </select>
+              <input type="text" id="buscarCliente" class="search-input" placeholder="🔍 Filtrar por Cliente o RUC..." onkeyup="filtrarClientesTabla()">
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Cliente / Razón Social</th>
+                  <th style="text-align: center;">Cant. OTs Activas</th>
+                  <th style="text-align: right;">Suma IMPORTE S/.</th>
+                  <th style="text-align: right;">S/ CON IGV</th>
+                  <th style="text-align: right;">Suma IMPORTE $</th>
+                  <th style="text-align: right;">$ CON IGV</th>
+                </tr>
+              </thead>
+              <tbody id="tablaResumenClientes">
+                <tr><td colspan="6" style="text-align: center;">Cargando reporte...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <footer class="executive-footer">
+    <div>© 2026 <strong>INRELSA</strong> — Centro de Control & Logística Corporativa. Todos los derechos reservados.</div>
+    <div class="footer-credits">
+      <span>Desarrollado por <strong>Annel Cajo Vargas</strong></span>
+      <span class="footer-dot"></span>
+      <span>Sistemas & Tecnologías de Información</span>
+    </div>
+  </footer>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwjqgvZ7XQpgjiSU4DhlnFzxqRJ9cjEaPIm-aq8lGOishsDcMOAZx_E9886DVoBjg/exec";
+    let datasetGlobal = [];
+    let mapaClientesRuc = {};
+    let mapaNombreRuc = {};
+    let filtroEstadoVista = 'ALL';
+
+    window.onload = function() {
+      cargarRegistros();
+      initInteractiveBackground();
+    };
+
+    function abrirModulo(modId) {
+      document.getElementById('screenLanding').style.display = 'none';
+      document.getElementById('screenModule').style.display = 'block';
+
+      document.querySelectorAll('.module-content').forEach(m => m.style.display = 'none');
+      document.getElementById(modId).style.display = 'block';
+
+      const nombres = {
+        'mod1': '📝 Módulo 1: Registrar Nueva Orden de Trabajo',
+        'mod2': '🔄 Módulo 2: Cambiar Estado de OT Existente',
+        'mod3': '📋 Módulo 3: Detalle General y Proyecciones',
+        'mod4': '📊 Módulo 4: Resumen Ejecutivo Comercial'
+      };
+      document.getElementById('moduleBreadcrumb').innerText = nombres[modId] || '';
+    }
+
+    function volverAlMenu() {
+      document.getElementById('screenModule').style.display = 'none';
+      document.getElementById('screenLanding').style.display = 'block';
+    }
+
+    function limpiarMonto(val) {
+      if (!val) return 0;
+      if (typeof val === 'number') return val;
+      let str = val.toString().replace(/[^0-9.-]/g, '');
+      return parseFloat(str) || 0;
+    }
+
+    function buscarAutocompletadoRuc(rucValor) {
+      const rucLimpio = rucValor.toString().trim();
+      const inputCliente = document.getElementById('razonSocial');
+      const hintRuc = document.getElementById('hintRuc');
+
+      if (mapaClientesRuc[rucLimpio]) {
+        inputCliente.value = mapaClientesRuc[rucLimpio];
+        hintRuc.innerText = "✨ Cliente detectado de la Base de Datos";
+        hintRuc.style.display = 'block';
+        return;
+      }
+
+      if (rucLimpio.length === 11) {
+        hintRuc.innerText = "🔍 Consultando SUNAT en vivo...";
+        hintRuc.style.display = 'block';
+
+        fetch(`https://api.apis.net.pe/v1/ruc?numero=${rucLimpio}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data && data.nombre) {
+              inputCliente.value = data.nombre;
+              hintRuc.innerText = "✅ Autocompletado desde SUNAT";
+            } else {
+              hintRuc.style.display = 'none';
+            }
+          })
+          .catch(() => {
+            hintRuc.style.display = 'none';
+          });
+      } else {
+        hintRuc.style.display = 'none';
+      }
+    }
+
+    function buscarAutocompletadoCliente(nombreValor) {
+      const nombreLimpio = nombreValor.toString().trim().toUpperCase();
+      const inputRuc = document.getElementById('ruc');
+      const hintCliente = document.getElementById('hintCliente');
+
+      if (mapaNombreRuc[nombreLimpio]) {
+        inputRuc.value = mapaNombreRuc[nombreLimpio];
+        hintCliente.style.display = 'block';
+      } else {
+        hintCliente.style.display = 'none';
+      }
+    }
+
+    function poblarDatalistClientes() {
+      const datalist = document.getElementById('listaClientes');
+      if(!datalist) return;
+      datalist.innerHTML = '';
+      
+      Object.keys(mapaNombreRuc).forEach(nombre => {
+        const option = document.createElement('option');
+        option.value = nombre;
+        datalist.appendChild(option);
+      });
+    }
+
+    function actualizarEstadoOT() {
+      const ot = document.getElementById('updateOtInput').value.trim();
+      const btn = document.getElementById('btnActualizarOT');
+
+      if (!ot) {
+        alert("⚠️ Por favor ingresa el número de OT a actualizar (ej. 7313).");
+        return;
+      }
+
+      const nuevosEstados = Array.from(document.querySelectorAll('.update-check:checked'))
+                                 .map(cb => cb.value)
+                                 .join(' | ');
+
+      if (!nuevosEstados) {
+        alert("⚠️ Por favor marca al menos un estado (ej: 'Entregado' o 'Anulado').");
+        return;
+      }
+
+      btn.innerText = "Actualizando en Excel...";
+      btn.disabled = true;
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: "updateStatus",
+          ot: ot,
+          nuevoEstado: nuevosEstados
+        })
+      }).then(() => {
+        alert(`¡Éxito! Estado de la OT N° ${ot} actualizado a "${nuevosEstados}" en el Excel.`);
+        document.getElementById('updateOtInput').value = '';
+        document.querySelectorAll('.update-check').forEach(cb => cb.checked = false);
+        btn.innerText = "🔄 Guardar Cambio de Estado en Excel";
+        btn.disabled = false;
+        setTimeout(cargarRegistros, 1200);
+      }).catch(err => {
+        alert("Error al conectar con Google Sheets.");
+        btn.innerText = "🔄 Guardar Cambio de Estado en Excel";
+        btn.disabled = false;
+      });
+    }
+
+    document.getElementById('salesForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnGuardar');
+      btn.innerText = "Guardando en Excel...";
+      btn.disabled = true;
+
+      const estados = Array.from(document.querySelectorAll('.estado-check:checked'))
+                          .map(cb => cb.value)
+                          .join(' | ');
+
+      const data = {
+        fecha: document.getElementById('fecha').value,
+        nroCotizacion: document.getElementById('nroCotizacion').value,
+        ruc: document.getElementById('ruc').value,
+        razonSocial: document.getElementById('razonSocial').value,
+        nroOrden: document.getElementById('nroOrden').value,
+        ot: document.getElementById('ot').value,
+        cantidad: document.getElementById('cantidad').value,
+        descripcion: document.getElementById('descripcion').value,
+        importeSoles: document.getElementById('importeSoles').value || 0,
+        importeDolares: document.getElementById('importeDolares').value || 0,
+        estados: estados
+      };
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      }).then(() => {
+        alert('¡Nueva Orden de Trabajo guardada en Google Sheets!');
+        document.getElementById('salesForm').reset();
+        document.getElementById('hintRuc').style.display = 'none';
+        document.getElementById('hintCliente').style.display = 'none';
+        btn.innerText = "Guardar Nueva Venta en Excel";
+        btn.disabled = false;
+        setTimeout(cargarRegistros, 1200);
+      });
+    });
+
+    function cargarRegistros() {
+      fetch(SCRIPT_URL)
+        .then(res => res.json())
+        .then(data => {
+          if(!data || data.length <= 1) return;
+          datasetGlobal = data;
+
+          mapaClientesRuc = {};
+          mapaNombreRuc = {};
+          for (let i = 1; i < data.length; i++) {
+            const ruc = (data[i][2] || '').toString().trim();
+            const cliente = (data[i][3] || '').toString().trim().toUpperCase();
+            if (ruc && cliente && ruc !== '-' && ruc !== 'N/A') {
+              mapaClientesRuc[ruc] = cliente;
+              mapaNombreRuc[cliente] = ruc;
+            }
+          }
+          poblarDatalistClientes();
+
+          aplicarFiltros();
+          aplicarFiltrosComercial();
+        });
+    }
+
+    function renderBadges(estadoTexto) {
+      if(!estadoTexto) return '<span class="badge badge-default">Sin Estado</span>';
+      
+      const partes = estadoTexto.split('|').map(s => s.trim());
+      let html = '<div class="badge-group">';
+
+      partes.forEach(st => {
+        let clase = 'badge-default';
+        if(st.includes('Proceso') || st.includes('Pendiente')) clase = 'badge-proceso';
+        else if(st.includes('Terminado')) clase = 'badge-terminado';
+        else if(st.includes('Entregado')) clase = 'badge-entregado';
+        else if(st.includes('Facturado')) clase = 'badge-facturado';
+        else if(st.includes('Cobrado')) clase = 'badge-cobrado';
+        else if(st.includes('Anulado')) clase = 'badge-anulado';
+
+        html += `<span class="badge ${clase}">${st}</span>`;
+      });
+
+      html += '</div>';
+      return html;
+    }
+
+    function setVistaFiltro(tipo) {
+      filtroEstadoVista = tipo;
+      document.querySelectorAll('.btn-switch').forEach(b => b.classList.remove('active'));
+      if(tipo === 'ALL') document.getElementById('swAll').classList.add('active');
+      if(tipo === 'REAL') document.getElementById('swReal').classList.add('active');
+      if(tipo === 'PROY') document.getElementById('swProy').classList.add('active');
+      if(tipo === 'ANUL') document.getElementById('swAnul').classList.add('active');
+      
+      filtrarTablaGeneral();
+    }
+
+    // CÁLCULO FINANCIERO CON TOTALES DE PÉRDIDAS POR ANULACIÓN
+    function aplicarFiltros() {
+      const mesSeleccionado = document.getElementById('filtroMes').value;
+      const tbody = document.getElementById('tablaCuerpo');
+      tbody.innerHTML = '';
+
+      let realSoles = 0, realDolares = 0;
+      let proySoles = 0, proyDolares = 0;
+      let anulSoles = 0, anulDolares = 0;
+      let otsActivas = 0, otsAnuladas = 0;
+
+      for (let i = 1; i < datasetGlobal.length; i++) {
+        const fila = datasetGlobal[i];
+        if(!fila[0]) continue;
+
+        const fechaObj = new Date(fila[0]);
+        const mesFila = fechaObj.getMonth();
+
+        if (mesSeleccionado !== "TODOS" && parseInt(mesSeleccionado) !== mesFila) {
+          continue;
+        }
+
+        const ruc = (fila[2] || '').toString().trim();
+        const cliente = (fila[3] || 'S/N - Varios').trim();
+        const soles = limpiarMonto(fila[8]);
+        const dolares = limpiarMonto(fila[10]);
+        const estadoTexto = (fila[12] || '').toString();
+
+        const esAnulado = estadoTexto.includes('Anulado');
+        const esFacturado = (estadoTexto.includes('Facturado') || estadoTexto.includes('Cobrado'));
+
+        if (esAnulado) {
+          // SUMA A LA TARJETA DE PÉRDIDA POR ANULADO
+          otsAnuladas++;
+          anulSoles += soles;
+          anulDolares += dolares;
+        } else {
+          // SUMA A FACTURADO REAL O PROYECCIÓN
+          otsActivas++;
+          if (esFacturado) {
+            realSoles += soles;
+            realDolares += dolares;
+          } else {
+            proySoles += soles;
+            proyDolares += dolares;
+          }
+        }
+
+        const tr = document.createElement('tr');
+        tr.className = `fila-general ${esAnulado ? 'fila-anulada' : ''}`;
+        tr.dataset.soles = soles;
+        tr.dataset.dolares = dolares;
+        tr.dataset.anulado = esAnulado ? '1' : '0';
+        tr.dataset.facturado = (esFacturado && !esAnulado) ? '1' : '0';
+
+        tr.innerHTML = `
+          <td>${fechaObj.toLocaleDateString()}</td>
+          <td>${fila[1] || '-'}</td>
+          <td><code>${ruc || '-'}</code></td>
+          <td><strong>${cliente}</strong></td>
+          <td><strong>${fila[5] || '-'}</strong></td>
+          <td>${fila[7] || '-'}</td>
+          <td style="text-align: right;">${soles > 0 ? 'S/ ' + soles.toLocaleString('es-PE', {minimumFractionDigits: 2}) : '-'}</td>
+          <td style="text-align: right;">${dolares > 0 ? '$ ' + dolares.toLocaleString('en-US', {minimumFractionDigits: 2}) : '-'}</td>
+          <td style="text-align: center;">${renderBadges(estadoTexto)}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+
+      // ACTUALIZAR CONTADORES DE LAS TARJETAS
+      document.getElementById('stripRealSoles').innerText = 'S/ ' + realSoles.toLocaleString('es-PE', {minimumFractionDigits: 2});
+      document.getElementById('stripRealDolares').innerText = '$ ' + realDolares.toLocaleString('en-US', {minimumFractionDigits: 2});
+
+      document.getElementById('stripProySoles').innerText = 'S/ ' + proySoles.toLocaleString('es-PE', {minimumFractionDigits: 2});
+      document.getElementById('stripProyDolares').innerText = '$ ' + proyDolares.toLocaleString('en-US', {minimumFractionDigits: 2});
+
+      const potSoles = realSoles + proySoles;
+      const potDolares = realDolares + proyDolares;
+      document.getElementById('stripPotSoles').innerText = 'S/ ' + potSoles.toLocaleString('es-PE', {minimumFractionDigits: 2});
+      document.getElementById('stripPotDolares').innerText = '$ ' + potDolares.toLocaleString('en-US', {minimumFractionDigits: 2}) + ' USD';
+      document.getElementById('stripOtsActivas').innerText = otsActivas;
+
+      // VALORES DE LA TARJETA DE ANULADOS / PÉRDIDAS
+      document.getElementById('stripAnulSoles').innerText = 'S/ ' + anulSoles.toLocaleString('es-PE', {minimumFractionDigits: 2});
+      document.getElementById('stripAnulDolares').innerText = '$ ' + anulDolares.toLocaleString('en-US', {minimumFractionDigits: 2}) + ' USD';
+      document.getElementById('stripOtsAnuladas').innerText = otsAnuladas;
+
+      filtrarTablaGeneral();
+    }
+
+    function aplicarFiltrosComercial() {
+      const mesSeleccionado = document.getElementById('filtroMesComercial').value;
+      let clientesMap = {};
+
+      for (let i = 1; i < datasetGlobal.length; i++) {
+        const fila = datasetGlobal[i];
+        if(!fila[0]) continue;
+
+        const fechaObj = new Date(fila[0]);
+        const mesFila = fechaObj.getMonth();
+
+        if (mesSeleccionado !== "TODOS" && parseInt(mesSeleccionado) !== mesFila) {
+          continue;
+        }
+
+        const estadoTexto = (fila[12] || '').toString();
+        if (estadoTexto.includes('Anulado')) continue;
+
+        const ruc = (fila[2] || '').toString().trim();
+        const cliente = (fila[3] || 'S/N - Varios').trim();
+        const soles = limpiarMonto(fila[8]);
+        const dolares = limpiarMonto(fila[10]);
+
+        if(!clientesMap[cliente]) clientesMap[cliente] = { ruc: ruc, count: 0, soles: 0, dolares: 0 };
+        clientesMap[cliente].count += 1;
+        clientesMap[cliente].soles += soles;
+        clientesMap[cliente].dolares += dolares;
+      }
+
+      renderTablaClientes(clientesMap);
+      filtrarClientesTabla();
+    }
+
+    function renderTablaClientes(clientesMap) {
+      const tbody = document.getElementById('tablaResumenClientes');
+      tbody.innerHTML = '';
+
+      const lista = Object.keys(clientesMap).sort((a,b) => clientesMap[b].soles - clientesMap[a].soles);
+
+      if(lista.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No hay registros activos en este período.</td></tr>';
+        return;
+      }
+
+      lista.forEach(cliente => {
+        const item = clientesMap[cliente];
+        const tr = document.createElement('tr');
+        tr.className = 'fila-cliente';
+        tr.dataset.soles = item.soles;
+        tr.dataset.dolares = item.dolares;
+        tr.dataset.count = item.count;
+        tr.innerHTML = `
+          <td><strong>${cliente}</strong> ${item.ruc ? '<br><small style="color:#64748b;">RUC: '+item.ruc+'</small>' : ''}</td>
+          <td style="text-align: center;">${item.count}</td>
+          <td style="text-align: right;">${item.soles > 0 ? 'S/ ' + item.soles.toLocaleString('es-PE', {minimumFractionDigits: 2}) : '-'}</td>
+          <td style="text-align: right;">${item.soles > 0 ? 'S/ ' + (item.soles * 1.18).toLocaleString('es-PE', {minimumFractionDigits: 2}) : '-'}</td>
+          <td style="text-align: right;">${item.dolares > 0 ? '$ ' + item.dolares.toLocaleString('en-US', {minimumFractionDigits: 2}) : '-'}</td>
+          <td style="text-align: right;">${item.dolares > 0 ? '$ ' + (item.dolares * 1.18).toLocaleString('en-US', {minimumFractionDigits: 2}) : '-'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filtrarClientesTabla() {
+      const q = document.getElementById('buscarCliente').value.toLowerCase();
+      const filas = document.querySelectorAll('.fila-cliente');
+      filas.forEach(f => {
+        const texto = f.innerText.toLowerCase();
+        f.style.display = texto.includes(q) ? '' : 'none';
+      });
+    }
+
+    function filtrarTablaGeneral() {
+      const q = document.getElementById('buscarGeneral').value.toLowerCase();
+      const filas = document.querySelectorAll('.fila-general');
+
+      filas.forEach(f => {
+        const texto = f.innerText.toLowerCase();
+        const esAnulado = f.dataset.anulado === '1';
+        const esFacturado = f.dataset.facturado === '1';
+
+        let cumpleSwitch = true;
+        if (filtroEstadoVista === 'REAL' && (!esFacturado || esAnulado)) cumpleSwitch = false;
+        if (filtroEstadoVista === 'PROY' && (esFacturado || esAnulado)) cumpleSwitch = false;
+        if (filtroEstadoVista === 'ANUL' && !esAnulado) cumpleSwitch = false;
+
+        if (texto.includes(q) && cumpleSwitch) {
+          f.style.display = '';
+        } else {
+          f.style.display = 'none';
+        }
+      });
+    }
+
+    function initInteractiveBackground() {
+      const canvas = document.getElementById('bg-canvas');
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      class Particle {
+        constructor() {
+          this.x = Math.random() * canvas.width;
+          this.y = Math.random() * canvas.height;
+          this.vx = (Math.random() - 0.5) * 0.6;
+          this.vy = (Math.random() - 0.5) * 0.6;
+          this.radius = Math.random() * 2 + 1;
+        }
+
+        update() {
+          this.x += this.vx;
+          this.y += this.vy;
+          if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+          if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+        }
+
+        draw() {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(35, 130, 199, 0.4)';
+          ctx.fill();
+        }
+      }
+
+      for (let i = 0; i < 40; i++) particles.push(new Particle());
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < particles.length; i++) {
+          particles[i].update();
+          particles[i].draw();
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 130) {
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.strokeStyle = `rgba(35, 130, 199, ${0.15 - dist/1300})`;
+              ctx.lineWidth = 0.8;
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(animate);
+      }
+      animate();
+    }
+  </script>
+</body>
+</html>
