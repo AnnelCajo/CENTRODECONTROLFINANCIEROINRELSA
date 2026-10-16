@@ -4,16 +4,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>INRELSA | Centro de Control y Logística</title>
+  
+  <!-- LIBRERÍA DE ÍCONOS VECTORIALES LUCIDE (MINIMALISTAS) -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
   <style>
-    /* PALETA CORPORATIVA ESTILO FORBES / INRELSA */
+    /* PALETA CORPORATIVA INDUSTRIAL / INRELSA */
     :root {
       --primary-dark: #0d3880;
       --primary-blue: #2382c7;
+      --accent-cyan: #38bdf8;
       --card-bg: rgba(255, 255, 255, 0.98);
       --text-main: #0f172a;
+      --text-muted: #64748b;
       
-      /* BADGES */
-      --st-proceso-bg: #fef3c7; --st-proceso-txt: #b45309; /* PENDIENTE */
+      /* BADGES DE ESTADO VECTORIALES */
+      --st-proceso-bg: #fef3c7; --st-proceso-txt: #b45309;
       --st-terminado-bg: #dcfce7; --st-terminado-txt: #15803d;
       --st-entregado-bg: #f3e8ff; --st-entregado-txt: #6b21a8;
       --st-facturado-bg: #dbeafe; --st-facturado-txt: #1e40af;
@@ -81,6 +87,7 @@
       margin: 0;
     }
 
+    /* TARJETAS POLAROID - OPCIÓN B (DUAL-TONE GLOW CORREGIDO) */
     .polaroid-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -92,7 +99,7 @@
     .polaroid-card {
       background: #ffffff;
       padding: 16px 16px 25px 16px;
-      border-radius: 16px;
+      border-radius: 18px;
       box-shadow: 0 15px 35px rgba(0,0,0,0.4);
       cursor: pointer;
       transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -105,21 +112,42 @@
     }
 
     .polaroid-card:hover {
-      transform: translateY(-12px) rotate(1deg) scale(1.03);
-      box-shadow: 0 22px 45px rgba(35, 130, 199, 0.35);
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 20px 40px rgba(56, 189, 248, 0.25);
     }
 
-    .polaroid-photo {
+    /* CAJA GLOW CON MÁXIMO CONTRASTE Y LUZ DUAL */
+    .photo-box-glow {
       width: 100%;
-      height: 170px;
-      background: linear-gradient(135deg, #0d3880 0%, #1e40af 100%);
-      border-radius: 12px;
+      height: 160px;
+      background: linear-gradient(145deg, #0b224d 0%, #061533 100%);
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 3.6rem;
+      position: relative;
+      overflow: hidden;
       margin-bottom: 18px;
-      box-shadow: inset 0 2px 8px rgba(0,0,0,0.2);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+    }
+
+    .photo-box-glow::before {
+      content: '';
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      background: rgba(35, 130, 199, 0.55);
+      filter: blur(28px);
+      border-radius: 50%;
+    }
+
+    /* ÍCONOS BLANCOS NÍTIDOS CON SOMBRA DE LUZ CELESTE */
+    .photo-box-glow i, .photo-box-glow svg {
+      position: relative;
+      z-index: 2;
+      color: #ffffff !important;
+      stroke: #ffffff !important;
+      filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.8));
     }
 
     .polaroid-card h3 {
@@ -131,7 +159,7 @@
 
     .polaroid-card p {
       margin: 0;
-      color: #64748b;
+      color: var(--text-muted);
       font-size: 0.86rem;
       line-height: 1.4;
     }
@@ -145,6 +173,9 @@
       font-weight: 800;
       font-size: 0.78rem;
       text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
     #screenModule {
@@ -187,6 +218,20 @@
       padding: 30px;
       box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
       border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .module-header-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      color: var(--primary-dark);
+    }
+
+    .module-header-title h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 800;
     }
 
     .form-grid {
@@ -262,6 +307,11 @@
       border-color: var(--primary-dark);
     }
 
+    .status-btn-check:checked + .status-label svg {
+      color: white !important;
+      stroke: white !important;
+    }
+
     .status-btn-check.anulado-check:checked + .status-label {
       background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%);
       color: white;
@@ -279,41 +329,84 @@
       cursor: pointer;
       text-transform: uppercase;
       box-shadow: 0 4px 12px rgba(13, 56, 128, 0.25);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
 
-    /* CONTADORES FINANCIEROS Y PROYECCIÓN */
+    /* REDISEÑO EJECUTIVO KPI CARDS (MÓDULO 3) */
     .summary-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
       gap: 16px;
       margin-bottom: 25px;
     }
 
-    .summary-card {
-      padding: 18px;
-      border-radius: 12px;
-      color: white;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    .kpi-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 16px 18px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
     }
 
-    .summary-card-real-soles { background: linear-gradient(135deg, #065f46 0%, #059669 100%); }
-    .summary-card-real-dolares { background: linear-gradient(135deg, #047857 0%, #10b981 100%); }
-    .summary-card-proy-soles { background: linear-gradient(135deg, #b45309 0%, #d97706 100%); }
-    .summary-card-proy-dolares { background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%); }
-    .summary-card-potencial { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); }
-    .summary-card-anulado { background: linear-gradient(135deg, #991b1b 0%, #ef4444 100%); }
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+    }
 
-    .summary-card-title {
+    .kpi-real-soles::before, .kpi-real-dolares::before { background: #10b981; }
+    .kpi-proy-soles::before, .kpi-proy-dolares::before { background: #f59e0b; }
+    .kpi-potencial::before { background: #3b82f6; }
+    .kpi-anulado::before { background: #ef4444; }
+
+    .kpi-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .kpi-title {
       font-size: 0.72rem;
       text-transform: uppercase;
       font-weight: 800;
-      opacity: 0.9;
-      margin-bottom: 6px;
+      color: #64748b;
+      letter-spacing: 0.5px;
     }
 
-    .summary-card-val {
-      font-size: 1.4rem;
+    .kpi-badge-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .kpi-real-soles .kpi-badge-icon, .kpi-real-dolares .kpi-badge-icon { background: #d1fae5; color: #047857; }
+    .kpi-proy-soles .kpi-badge-icon, .kpi-proy-dolares .kpi-badge-icon { background: #fef3c7; color: #b45309; }
+    .kpi-potencial .kpi-badge-icon { background: #dbeafe; color: #1e40af; }
+    .kpi-anulado .kpi-badge-icon { background: #fee2e2; color: #991b1b; }
+
+    .kpi-val {
+      font-size: 1.35rem;
       font-weight: 800;
+      color: #0f172a;
+    }
+
+    .kpi-sub {
+      font-size: 0.75rem;
+      color: #64748b;
+      margin-top: 4px;
+      font-weight: 600;
     }
 
     .view-switches {
@@ -333,12 +426,20 @@
       font-weight: 700;
       color: #475569;
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .btn-switch.active {
       background: var(--primary-dark);
       color: white;
       border-color: var(--primary-dark);
+    }
+
+    .btn-switch.active svg {
+      color: white !important;
+      stroke: white !important;
     }
 
     .btn-pdf {
@@ -353,6 +454,9 @@
       margin-left: auto;
       box-shadow: 0 4px 10px rgba(13, 56, 128, 0.2);
       transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .btn-pdf:hover {
@@ -437,7 +541,6 @@
       text-decoration: line-through;
     }
 
-    /* ESTILOS PARA EL PIE DE TABLA CON TOTALES */
     tfoot td {
       background-color: #0d3880 !important;
       color: #ffffff !important;
@@ -522,6 +625,7 @@
 
   <div class="app-container">
     
+    <!-- PANTALLA PRINCIPAL CON ÍCONOS OPCIÓN B (ILUMINADOS Y BLANCOS) -->
     <div id="screenLanding">
       <div class="landing-title-box">
         <h1>BIENVENIDO AL CENTRO DE CONTROL Y LOGÍSTICA DE INRELSA</h1>
@@ -530,31 +634,39 @@
 
       <div class="polaroid-grid">
         <div class="polaroid-card" onclick="abrirModulo('mod1')">
-          <div class="polaroid-photo">📝</div>
+          <div class="photo-box-glow">
+            <i data-lucide="file-plus-2" stroke-width="2.2" size="52"></i>
+          </div>
           <h3>1. Ingresar Orden</h3>
           <p>Registra nuevas cotizaciones y órdenes de trabajo en el sistema</p>
-          <div class="polaroid-badge">Acceder a Registro ➔</div>
+          <div class="polaroid-badge">Acceder a Registro <i data-lucide="arrow-right" size="14"></i></div>
         </div>
 
         <div class="polaroid-card" onclick="abrirModulo('mod2')">
-          <div class="polaroid-photo">🔄</div>
+          <div class="photo-box-glow">
+            <i data-lucide="refresh-cw" stroke-width="2.2" size="52"></i>
+          </div>
           <h3>2. Cambiar Estado</h3>
           <p>Actualiza la fase de avance, facturación o anulación de una OT</p>
-          <div class="polaroid-badge">Actualizar Estado ➔</div>
+          <div class="polaroid-badge">Actualizar Estado <i data-lucide="arrow-right" size="14"></i></div>
         </div>
 
         <div class="polaroid-card" onclick="abrirModulo('mod3')">
-          <div class="polaroid-photo">📋</div>
+          <div class="photo-box-glow">
+            <i data-lucide="clipboard-list" stroke-width="2.2" size="52"></i>
+          </div>
           <h3>3. Resumen de OT</h3>
           <p>Consulta el semáforo financiero, facturación real vs. proyección</p>
-          <div class="polaroid-badge">Ver Proyecciones ➔</div>
+          <div class="polaroid-badge">Ver Proyecciones <i data-lucide="arrow-right" size="14"></i></div>
         </div>
 
         <div class="polaroid-card" onclick="abrirModulo('mod4')">
-          <div class="polaroid-photo">📊</div>
+          <div class="photo-box-glow">
+            <i data-lucide="bar-chart-3" stroke-width="2.2" size="52"></i>
+          </div>
           <h3>4. Resumen Ejecutivo</h3>
           <p>Análisis acumulado de ventas y clientes atendidos por RUC</p>
-          <div class="polaroid-badge">Ver Comercial ➔</div>
+          <div class="polaroid-badge">Ver Comercial <i data-lucide="arrow-right" size="14"></i></div>
         </div>
       </div>
     </div>
@@ -562,13 +674,19 @@
     <div id="screenModule">
       
       <div class="top-bar-module">
-        <button class="btn-back-menu" onclick="volverAlMenu()">⬅️ Volver al Menú Principal</button>
-        <span id="moduleBreadcrumb" style="color:#94a3b8; font-weight:700; font-size:0.95rem;"></span>
+        <button class="btn-back-menu" onclick="volverAlMenu()">
+          <i data-lucide="arrow-left" size="16"></i> Volver al Menú Principal
+        </button>
+        <div id="moduleBreadcrumb" style="color:#94a3b8; font-weight:700; font-size:0.95rem; display:flex; align-items:center; gap:8px;"></div>
       </div>
 
+      <!-- MÓDULO 1 -->
       <div id="mod1" class="module-content" style="display:none;">
         <div class="module-card">
-          <h2 style="margin:0 0 20px 0; color:var(--primary-dark);">📝 Registrar Nueva Orden de Trabajo</h2>
+          <div class="module-header-title">
+            <i data-lucide="file-plus-2" size="28" style="color:var(--primary-blue);"></i>
+            <h2>Registrar Nueva Orden de Trabajo</h2>
+          </div>
           <form id="salesForm">
             <div class="form-grid">
               <div class="form-group"><label>Fecha de Orden</label><input type="date" id="fecha" required></div>
@@ -597,23 +715,40 @@
               <div class="status-container">
                 <span style="font-weight: 700; font-size: 0.85rem; color: var(--primary-dark);">Estado Inicial:</span>
                 <div class="status-options">
-                  <input type="checkbox" id="st1" class="status-btn-check estado-check" value="Pendiente" checked><label for="st1" class="status-label">⏳ Pendiente</label>
-                  <input type="checkbox" id="st2" class="status-btn-check estado-check" value="Terminado"><label for="st2" class="status-label">✅ Terminado</label>
-                  <input type="checkbox" id="st3" class="status-btn-check estado-check" value="Entregado"><label for="st3" class="status-label">📦 Entregado</label>
-                  <input type="checkbox" id="st4" class="status-btn-check estado-check" value="Facturado"><label for="st4" class="status-label">📄 Facturado</label>
-                  <input type="checkbox" id="st5" class="status-btn-check estado-check" value="Cobrado"><label for="st5" class="status-label">💰 Cobrado</label>
-                  <input type="checkbox" id="st6" class="status-btn-check estado-check anulado-check" value="Anulado"><label for="st6" class="status-label">🚫 Anulado</label>
+                  <input type="checkbox" id="st1" class="status-btn-check estado-check" value="Pendiente" checked>
+                  <label for="st1" class="status-label"><i data-lucide="clock" size="16" style="color:#b45309;"></i> Pendiente</label>
+                  
+                  <input type="checkbox" id="st2" class="status-btn-check estado-check" value="Terminado">
+                  <label for="st2" class="status-label"><i data-lucide="check-circle-2" size="16" style="color:#15803d;"></i> Terminado</label>
+                  
+                  <input type="checkbox" id="st3" class="status-btn-check estado-check" value="Entregado">
+                  <label for="st3" class="status-label"><i data-lucide="package-check" size="16" style="color:#6b21a8;"></i> Entregado</label>
+                  
+                  <input type="checkbox" id="st4" class="status-btn-check estado-check" value="Facturado">
+                  <label for="st4" class="status-label"><i data-lucide="file-check-2" size="16" style="color:#1e40af;"></i> Facturado</label>
+                  
+                  <input type="checkbox" id="st5" class="status-btn-check estado-check" value="Cobrado">
+                  <label for="st5" class="status-label"><i data-lucide="circle-dollar-sign" size="16" style="color:#854d0e;"></i> Cobrado</label>
+                  
+                  <input type="checkbox" id="st6" class="status-btn-check estado-check anulado-check" value="Anulado">
+                  <label for="st6" class="status-label"><i data-lucide="x-circle" size="16" style="color:#991b1b;"></i> Anulado</label>
                 </div>
               </div>
             </div>
-            <button type="submit" class="btn-action" id="btnGuardar" style="width: 100%; margin-top: 20px;">Guardar Nueva Venta en Excel</button>
+            <button type="submit" class="btn-action" id="btnGuardar" style="width: 100%; margin-top: 20px;">
+              <i data-lucide="save" size="18"></i> Guardar Nueva Venta en Excel
+            </button>
           </form>
         </div>
       </div>
 
+      <!-- MÓDULO 2 -->
       <div id="mod2" class="module-content" style="display:none;">
         <div class="module-card">
-          <h2 style="margin:0 0 10px 0; color:var(--primary-dark);">🔄 Cambiar Estado de una OT Existente</h2>
+          <div class="module-header-title">
+            <i data-lucide="refresh-cw" size="28" style="color:var(--primary-blue);"></i>
+            <h2>Cambiar Estado de una OT Existente</h2>
+          </div>
           <p style="color:#64748b; margin-bottom:20px;">Ingresa el número de OT y selecciona los nuevos estados para actualizar el Excel.</p>
           
           <div class="form-group" style="margin-bottom: 20px;">
@@ -624,23 +759,40 @@
           <div class="status-container" style="background: white;">
             <span style="font-weight: 700; font-size: 0.85rem; color: var(--primary-dark);">Selecciona los nuevos estados:</span>
             <div class="status-options">
-              <input type="checkbox" id="up_st1" class="status-btn-check update-check" value="Pendiente"><label for="up_st1" class="status-label">⏳ Pendiente</label>
-              <input type="checkbox" id="up_st2" class="status-btn-check update-check" value="Terminado"><label for="up_st2" class="status-label">✅ Terminado</label>
-              <input type="checkbox" id="up_st3" class="status-btn-check update-check" value="Entregado"><label for="up_st3" class="status-label">📦 Entregado</label>
-              <input type="checkbox" id="up_st4" class="status-btn-check update-check" value="Facturado"><label for="up_st4" class="status-label">📄 Facturado</label>
-              <input type="checkbox" id="up_st5" class="status-btn-check update-check" value="Cobrado"><label for="up_st5" class="status-label">💰 Cobrado</label>
-              <input type="checkbox" id="up_st6" class="status-btn-check update-check anulado-check" value="Anulado"><label for="up_st6" class="status-label">🚫 Anulado</label>
+              <input type="checkbox" id="up_st1" class="status-btn-check update-check" value="Pendiente">
+              <label for="up_st1" class="status-label"><i data-lucide="clock" size="16" style="color:#b45309;"></i> Pendiente</label>
+              
+              <input type="checkbox" id="up_st2" class="status-btn-check update-check" value="Terminado">
+              <label for="up_st2" class="status-label"><i data-lucide="check-circle-2" size="16" style="color:#15803d;"></i> Terminado</label>
+
+              <input type="checkbox" id="up_st3" class="status-btn-check update-check" value="Entregado">
+              <label for="up_st3" class="status-label"><i data-lucide="package-check" size="16" style="color:#6b21a8;"></i> Entregado</label>
+
+              <input type="checkbox" id="up_st4" class="status-btn-check update-check" value="Facturado">
+              <label for="up_st4" class="status-label"><i data-lucide="file-check-2" size="16" style="color:#1e40af;"></i> Facturado</label>
+
+              <input type="checkbox" id="up_st5" class="status-btn-check update-check" value="Cobrado">
+              <label for="up_st5" class="status-label"><i data-lucide="circle-dollar-sign" size="16" style="color:#854d0e;"></i> Cobrado</label>
+
+              <input type="checkbox" id="up_st6" class="status-btn-check update-check anulado-check" value="Anulado">
+              <label for="up_st6" class="status-label"><i data-lucide="x-circle" size="16" style="color:#991b1b;"></i> Anulado</label>
             </div>
           </div>
 
-          <button type="button" class="btn-action" id="btnActualizarOT" onclick="actualizarEstadoOT()" style="margin-top: 20px; width: 100%;">🔄 Guardar Cambio de Estado en Excel</button>
+          <button type="button" class="btn-action" id="btnActualizarOT" onclick="actualizarEstadoOT()" style="margin-top: 20px; width: 100%;">
+            <i data-lucide="rotate-cw" size="18"></i> Guardar Cambio de Estado en Excel
+          </button>
         </div>
       </div>
 
+      <!-- MÓDULO 3 CON TARJETAS KPI REDISEÑADAS Y LIMPIAS -->
       <div id="mod3" class="module-content" style="display:none;">
         <div class="module-card">
           <div class="filter-header">
-            <h2 style="margin: 0; color: var(--primary-dark);">📋 Detalle General de Órdenes y Proyecciones</h2>
+            <div class="module-header-title" style="margin: 0;">
+              <i data-lucide="clipboard-list" size="28" style="color:var(--primary-blue);"></i>
+              <h2>Detalle General de Órdenes y Proyecciones</h2>
+            </div>
             
             <div class="filter-controls">
               <label style="font-weight: bold; font-size: 0.88rem; color: var(--primary-dark);">Filtrar por Mes:</label>
@@ -655,53 +807,80 @@
             </div>
           </div>
 
-          <!-- TARJETAS FINANCIERAS -->
+          <!-- TARJETAS KPI CON DISEÑO EJECUTIVO MINIMALISTA -->
           <div class="summary-grid">
-            <div class="summary-card summary-card-real-soles">
-              <div class="summary-card-title">🟢 Facturado Real (S/ PEN)</div>
-              <div class="summary-card-val" id="stripRealSoles">S/ 0.00</div>
+            
+            <div class="kpi-card kpi-real-soles">
+              <div class="kpi-top">
+                <span class="kpi-title">Facturado Real (S/.)</span>
+                <div class="kpi-badge-icon"><i data-lucide="check-circle-2" size="18"></i></div>
+              </div>
+              <div class="kpi-val" id="stripRealSoles">S/ 0.00</div>
             </div>
 
-            <div class="summary-card summary-card-real-dolares">
-              <div class="summary-card-title">🟢 Facturado Real ($ USD)</div>
-              <div class="summary-card-val" id="stripRealDolares">$ 0.00</div>
+            <div class="kpi-card kpi-real-dolares">
+              <div class="kpi-top">
+                <span class="kpi-title">Facturado Real ($)</span>
+                <div class="kpi-badge-icon"><i data-lucide="check-circle-2" size="18"></i></div>
+              </div>
+              <div class="kpi-val" id="stripRealDolares">$ 0.00</div>
             </div>
 
-            <div class="summary-card summary-card-proy-soles">
-              <div class="summary-card-title">🟡 Proyección Pendiente (S/ PEN)</div>
-              <div class="summary-card-val" id="stripProySoles">S/ 0.00</div>
+            <div class="kpi-card kpi-proy-soles">
+              <div class="kpi-top">
+                <span class="kpi-title">Proyección Pendiente (S/.)</span>
+                <div class="kpi-badge-icon"><i data-lucide="clock" size="18"></i></div>
+              </div>
+              <div class="kpi-val" id="stripProySoles">S/ 0.00</div>
             </div>
 
-            <div class="summary-card summary-card-proy-dolares">
-              <div class="summary-card-title">🟡 Proyección Pendiente ($ USD)</div>
-              <div class="summary-card-val" id="stripProyDolares">$ 0.00</div>
+            <div class="kpi-card kpi-proy-dolares">
+              <div class="kpi-top">
+                <span class="kpi-title">Proyección Pendiente ($)</span>
+                <div class="kpi-badge-icon"><i data-lucide="clock" size="18"></i></div>
+              </div>
+              <div class="kpi-val" id="stripProyDolares">$ 0.00</div>
             </div>
 
-            <div class="summary-card summary-card-potencial">
-              <div class="summary-card-title">🔵 Potencial Total Mes</div>
-              <div class="summary-card-val" id="stripPotSoles" style="font-size:1.15rem;">S/ 0.00</div>
-              <div id="stripPotDolares" style="font-weight:bold; font-size:0.95rem; opacity:0.95;">$ 0.00 USD</div>
-              <small style="display:block; margin-top:4px; opacity:0.85;">OTs Activas: <span id="stripOtsActivas">0</span></small>
+            <div class="kpi-card kpi-potencial">
+              <div class="kpi-top">
+                <span class="kpi-title">Potencial Total Mes</span>
+                <div class="kpi-badge-icon"><i data-lucide="trending-up" size="18"></i></div>
+              </div>
+              <div class="kpi-val" id="stripPotSoles">S/ 0.00</div>
+              <div class="kpi-sub" id="stripPotDolares">$ 0.00 USD</div>
+              <div class="kpi-sub">OTs Activas: <span id="stripOtsActivas">0</span></div>
             </div>
 
-            <div class="summary-card summary-card-anulado">
-              <div class="summary-card-title">🔴 Pérdida por Anulados.</div>
-              <div class="summary-card-val" id="stripAnulSoles" style="font-size:1.15rem;">S/ 0.00</div>
-              <div id="stripAnulDolares" style="font-weight:bold; font-size:0.95rem; opacity:0.95;">$ 0.00 USD</div>
-              <small style="display:block; margin-top:4px; opacity:0.85;">OTs Anuladas: <span id="stripOtsAnuladas">0</span></small>
+            <div class="kpi-card kpi-anulado">
+              <div class="kpi-top">
+                <span class="kpi-title">Pérdida por Anulados</span>
+                <div class="kpi-badge-icon"><i data-lucide="x-circle" size="18"></i></div>
+              </div>
+              <div class="kpi-val" id="stripAnulSoles">S/ 0.00</div>
+              <div class="kpi-sub" id="stripAnulDolares">$ 0.00 USD</div>
+              <div class="kpi-sub">OTs Anuladas: <span id="stripOtsAnuladas">0</span></div>
             </div>
+
           </div>
 
           <div class="view-switches">
             <span style="font-size:0.82rem; font-weight:bold; color:var(--primary-dark); align-self:center;">Filtrar Vista:</span>
-            <button class="btn-switch active" id="swAll" onclick="setVistaFiltro('ALL')">📊 Ver Todos</button>
-            <button class="btn-switch" id="swReal" onclick="setVistaFiltro('REAL')">🟢 Solo Facturados / Cobrados</button>
-            <button class="btn-switch" id="swProy" onclick="setVistaFiltro('PROY')">🟡 Solo Pendientes / Proyección</button>
-            <button class="btn-switch" id="swAnul" onclick="setVistaFiltro('ANUL')">🚫 Solo Anulados</button>
+            <button class="btn-switch active" id="swAll" onclick="setVistaFiltro('ALL')">
+              <i data-lucide="layers" size="14"></i> Ver Todos
+            </button>
+            <button class="btn-switch" id="swReal" onclick="setVistaFiltro('REAL')">
+              <i data-lucide="check-circle-2" size="14" style="color:#10b981;"></i> Solo Facturados / Cobrados
+            </button>
+            <button class="btn-switch" id="swProy" onclick="setVistaFiltro('PROY')">
+              <i data-lucide="clock" size="14" style="color:#f59e0b;"></i> Solo Pendientes / Proyección
+            </button>
+            <button class="btn-switch" id="swAnul" onclick="setVistaFiltro('ANUL')">
+              <i data-lucide="x-circle" size="14" style="color:#ef4444;"></i> Solo Anulados
+            </button>
             
-            <!-- BOTÓN PARA DESCARGAR REPORTE PDF DEL MÓDULO 3 -->
             <button onclick="descargarPDFReporte()" class="btn-pdf">
-              📄 Descargar Reporte PDF
+              <i data-lucide="file-down" size="16"></i> Descargar Reporte PDF
             </button>
           </div>
 
@@ -717,7 +896,6 @@
               <tbody id="tablaCuerpo">
                 <tr><td colspan="9" style="text-align: center;">Cargando base de datos...</td></tr>
               </tbody>
-              <!-- FILA DE TOTALES DINÁMICOS AL PIE DE LA TABLA DEL MÓDULO 3 -->
               <tfoot>
                 <tr>
                   <td colspan="6" style="text-align: right; text-transform: uppercase;">Total Filtrado:</td>
@@ -731,10 +909,14 @@
         </div>
       </div>
 
+      <!-- MÓDULO 4 -->
       <div id="mod4" class="module-content" style="display:none;">
         <div class="module-card">
           <div class="filter-header">
-            <h2 style="margin: 0; color: var(--primary-dark);">📊 Resumen Ejecutivo Comercial por Cliente</h2>
+            <div class="module-header-title" style="margin: 0;">
+              <i data-lucide="bar-chart-3" size="28" style="color:var(--primary-blue);"></i>
+              <h2>Resumen Ejecutivo Comercial por Cliente</h2>
+            </div>
 
             <div class="filter-controls" style="width: 100%;">
               <label style="font-weight: bold; font-size: 0.88rem; color: var(--primary-dark);">Mes Comercial:</label>
@@ -747,9 +929,8 @@
               </select>
               <input type="text" id="buscarCliente" class="search-input" placeholder="🔍 Filtrar por Cliente o RUC..." onkeyup="filtrarClientesTabla()">
               
-              <!-- BOTÓN ALINEADO EXACTAMENTE A LA DERECHA -->
               <button onclick="descargarPDFComercial()" class="btn-pdf" style="margin-left: auto;">
-                📄 Descargar PDF Comercial
+                <i data-lucide="file-down" size="16"></i> Descargar PDF Comercial
               </button>
             </div>
           </div>
@@ -769,7 +950,6 @@
               <tbody id="tablaResumenClientes">
                 <tr><td colspan="6" style="text-align: center;">Cargando reporte...</td></tr>
               </tbody>
-              <!-- FILA DE TOTALES DINÁMICOS AL PIE DEL MÓDULO 4 -->
               <tfoot>
                 <tr>
                   <td style="text-align: right; text-transform: uppercase;">Total Acumulado:</td>
@@ -812,6 +992,7 @@
     window.onload = function() {
       cargarRegistros();
       initInteractiveBackground();
+      setTimeout(function() { lucide.createIcons(); }, 100);
     };
 
     function abrirModulo(modId) {
@@ -821,18 +1002,28 @@
       document.querySelectorAll('.module-content').forEach(m => m.style.display = 'none');
       document.getElementById(modId).style.display = 'block';
 
-      const nombres = {
-        'mod1': '📝 Módulo 1: Registrar Nueva Orden de Trabajo',
-        'mod2': '🔄 Módulo 2: Cambiar Estado de OT Existente',
-        'mod3': '📋 Módulo 3: Detalle General y Proyecciones',
-        'mod4': '📊 Módulo 4: Resumen Ejecutivo Comercial'
+      const configModulos = {
+        'mod1': { icon: 'file-plus-2', text: 'Módulo 1: Registrar Nueva Orden de Trabajo' },
+        'mod2': { icon: 'refresh-cw', text: 'Módulo 2: Cambiar Estado de OT Existente' },
+        'mod3': { icon: 'clipboard-list', text: 'Módulo 3: Detalle General y Proyecciones' },
+        'mod4': { icon: 'bar-chart-3', text: 'Módulo 4: Resumen Ejecutivo Comercial' }
       };
-      document.getElementById('moduleBreadcrumb').innerText = nombres[modId] || '';
+
+      const modInfo = configModulos[modId];
+      if (modInfo) {
+        document.getElementById('moduleBreadcrumb').innerHTML = `
+          <i data-lucide="${modInfo.icon}" size="18"></i>
+          <span>${modInfo.text}</span>
+        `;
+      }
+
+      setTimeout(function() { lucide.createIcons(); }, 50);
     }
 
     function volverAlMenu() {
       document.getElementById('screenModule').style.display = 'none';
       document.getElementById('screenLanding').style.display = 'block';
+      setTimeout(function() { lucide.createIcons(); }, 50);
     }
 
     function limpiarMonto(val) {
@@ -935,13 +1126,15 @@
         alert(`¡Éxito! Estado de la OT N° ${ot} actualizado a "${nuevosEstados}" en el Excel.`);
         document.getElementById('updateOtInput').value = '';
         document.querySelectorAll('.update-check').forEach(cb => cb.checked = false);
-        btn.innerText = "🔄 Guardar Cambio de Estado en Excel";
+        btn.innerHTML = `<i data-lucide="rotate-cw" size="18"></i> Guardar Cambio de Estado en Excel`;
         btn.disabled = false;
         setTimeout(cargarRegistros, 1200);
+        setTimeout(function() { lucide.createIcons(); }, 100);
       }).catch(err => {
         alert("Error al conectar con Google Sheets.");
-        btn.innerText = "🔄 Guardar Cambio de Estado en Excel";
+        btn.innerHTML = `<i data-lucide="rotate-cw" size="18"></i> Guardar Cambio de Estado en Excel`;
         btn.disabled = false;
+        setTimeout(function() { lucide.createIcons(); }, 100);
       });
     }
 
@@ -979,9 +1172,10 @@
         document.getElementById('salesForm').reset();
         document.getElementById('hintRuc').style.display = 'none';
         document.getElementById('hintCliente').style.display = 'none';
-        btn.innerText = "Guardar Nueva Venta en Excel";
+        btn.innerHTML = `<i data-lucide="save" size="18"></i> Guardar Nueva Venta en Excel`;
         btn.disabled = false;
         setTimeout(cargarRegistros, 1200);
+        setTimeout(function() { lucide.createIcons(); }, 100);
       });
     });
 
@@ -1017,14 +1211,16 @@
 
       partes.forEach(st => {
         let clase = 'badge-default';
-        if(st.includes('Proceso') || st.includes('Pendiente')) clase = 'badge-proceso';
-        else if(st.includes('Terminado')) clase = 'badge-terminado';
-        else if(st.includes('Entregado')) clase = 'badge-entregado';
-        else if(st.includes('Facturado')) clase = 'badge-facturado';
-        else if(st.includes('Cobrado')) clase = 'badge-cobrado';
-        else if(st.includes('Anulado')) clase = 'badge-anulado';
+        let iconName = 'info';
 
-        html += `<span class="badge ${clase}">${st}</span>`;
+        if(st.includes('Proceso') || st.includes('Pendiente')) { clase = 'badge-proceso'; iconName = 'clock'; }
+        else if(st.includes('Terminado')) { clase = 'badge-terminado'; iconName = 'check-circle-2'; }
+        else if(st.includes('Entregado')) { clase = 'badge-entregado'; iconName = 'package-check'; }
+        else if(st.includes('Facturado')) { clase = 'badge-facturado'; iconName = 'file-check-2'; }
+        else if(st.includes('Cobrado')) { clase = 'badge-cobrado'; iconName = 'circle-dollar-sign'; }
+        else if(st.includes('Anulado')) { clase = 'badge-anulado'; iconName = 'x-circle'; }
+
+        html += `<span class="badge ${clase}"><i data-lucide="${iconName}" size="12"></i> ${st}</span>`;
       });
 
       html += '</div>';
@@ -1042,7 +1238,6 @@
       filtrarTablaGeneral();
     }
 
-    // CÁLCULO FINANCIERO CON TOTALES DE PÉRDIDAS POR ANULACIÓN (MÓDULO 3)
     function aplicarFiltros() {
       const mesSeleccionado = document.getElementById('filtroMes').value;
       const tbody = document.getElementById('tablaCuerpo');
@@ -1109,7 +1304,6 @@
         tbody.appendChild(tr);
       }
 
-      // ACTUALIZAR CONTADORES DE LAS TARJETAS
       document.getElementById('stripRealSoles').innerText = 'S/ ' + realSoles.toLocaleString('es-PE', {minimumFractionDigits: 2});
       document.getElementById('stripRealDolares').innerText = '$ ' + realDolares.toLocaleString('en-US', {minimumFractionDigits: 2});
 
@@ -1127,9 +1321,9 @@
       document.getElementById('stripOtsAnuladas').innerText = otsAnuladas;
 
       filtrarTablaGeneral();
+      setTimeout(function() { lucide.createIcons(); }, 50);
     }
 
-    // CÁLCULO COMERCIAL Y TABLA (MÓDULO 4)
     function aplicarFiltrosComercial() {
       const mesSeleccionado = document.getElementById('filtroMesComercial').value;
       let clientesMap = {};
@@ -1198,7 +1392,6 @@
       });
     }
 
-    // FILTRAR Y SUMAR MÓDULO 4 (EN TIEMPO REAL AL BUSCAR)
     function filtrarClientesTabla() {
       const q = document.getElementById('buscarCliente').value.toLowerCase();
       const filas = document.querySelectorAll('.fila-cliente');
@@ -1219,7 +1412,6 @@
         }
       });
 
-      // Actualizar pie de tabla en el Módulo 4
       document.getElementById('totalComercialCount').innerText = totCount;
       document.getElementById('totalComercialSoles').innerText = 'S/ ' + totSoles.toLocaleString('es-PE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
       document.getElementById('totalComercialSolesIgv').innerText = 'S/ ' + (totSoles * 1.18).toLocaleString('es-PE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
@@ -1227,7 +1419,6 @@
       document.getElementById('totalComercialDolaresIgv').innerText = '$ ' + (totDolares * 1.18).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
     }
 
-    // FILTRADO DE TABLA Y RECALCULO DE SUMAS DEL PIE DE PÁGINA (MÓDULO 3)
     function filtrarTablaGeneral() {
       const q = document.getElementById('buscarGeneral').value.toLowerCase();
       const filas = document.querySelectorAll('.fila-general');
@@ -1254,12 +1445,10 @@
         }
       });
 
-      // Actualizar pie de tabla en la vista web del Módulo 3
       document.getElementById('totalFiltradoSoles').innerText = 'S/ ' + sumaSoles.toLocaleString('es-PE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
       document.getElementById('totalFiltradoDolares').innerText = '$ ' + sumaDolares.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
     }
 
-    // DESCARGAR REPORTE EN PDF (MÓDULO 3)
     function descargarPDFReporte() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF('landscape');
@@ -1311,7 +1500,6 @@
       doc.save(`Reporte_INRELSA_Ordenes_${new Date().toISOString().slice(0, 10)}.pdf`);
     }
 
-    // DESCARGAR REPORTE EN PDF (MÓDULO 4 - RESUMEN COMERCIAL)
     function descargarPDFComercial() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF('landscape');
