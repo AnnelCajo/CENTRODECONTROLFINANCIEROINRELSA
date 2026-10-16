@@ -281,7 +281,7 @@
       box-shadow: 0 4px 12px rgba(13, 56, 128, 0.25);
     }
 
-    /* CONTADORES FINANCIEROS Y PROYECCIÓN (AHORA CON 6 TARJETAS) */
+    /* CONTADORES FINANCIEROS Y PROYECCIÓN */
     .summary-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -301,7 +301,7 @@
     .summary-card-proy-soles { background: linear-gradient(135deg, #b45309 0%, #d97706 100%); }
     .summary-card-proy-dolares { background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%); }
     .summary-card-potencial { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); }
-    .summary-card-anulado { background: linear-gradient(135deg, #991b1b 0%, #ef4444 100%); } /* PERDIDO / ANULADO */
+    .summary-card-anulado { background: linear-gradient(135deg, #991b1b 0%, #ef4444 100%); }
 
     .summary-card-title {
       font-size: 0.72rem;
@@ -321,6 +321,7 @@
       gap: 10px;
       margin-bottom: 18px;
       flex-wrap: wrap;
+      align-items: center;
     }
 
     .btn-switch {
@@ -338,6 +339,25 @@
       background: var(--primary-dark);
       color: white;
       border-color: var(--primary-dark);
+    }
+
+    .btn-pdf {
+      background: linear-gradient(135deg, #0d3880 0%, #1e40af 100%);
+      color: white;
+      padding: 8px 18px;
+      border: none;
+      border-radius: 20px;
+      font-weight: 800;
+      font-size: 0.82rem;
+      cursor: pointer;
+      margin-left: auto;
+      box-shadow: 0 4px 10px rgba(13, 56, 128, 0.2);
+      transition: all 0.2s ease;
+    }
+
+    .btn-pdf:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(13, 56, 128, 0.3);
     }
 
     .filter-header {
@@ -415,6 +435,18 @@
       background-color: #fef2f2 !important;
       opacity: 0.6;
       text-decoration: line-through;
+    }
+
+    /* ESTILOS PARA EL PIE DE TABLA CON TOTALES */
+    tfoot td {
+      background-color: #0d3880 !important;
+      color: #ffffff !important;
+      font-weight: bold;
+      font-size: 0.90rem;
+      border-top: 2px solid #081226;
+      position: sticky;
+      bottom: 0;
+      z-index: 2;
     }
 
     .badge-group {
@@ -623,7 +655,7 @@
             </div>
           </div>
 
-          <!-- TARJETAS FINANCIERAS (INCLUYENDO TARJETA DE PÉRDIDAS POR ANULACIÓN) -->
+          <!-- TARJETAS FINANCIERAS -->
           <div class="summary-grid">
             <div class="summary-card summary-card-real-soles">
               <div class="summary-card-title">🟢 Facturado Real (S/ PEN)</div>
@@ -653,7 +685,7 @@
             </div>
 
             <div class="summary-card summary-card-anulado">
-              <div class="summary-card-title">🔴 Pérdida por Anulados</div>
+              <div class="summary-card-title">🔴 Pérdida por Anulados.</div>
               <div class="summary-card-val" id="stripAnulSoles" style="font-size:1.15rem;">S/ 0.00</div>
               <div id="stripAnulDolares" style="font-weight:bold; font-size:0.95rem; opacity:0.95;">$ 0.00 USD</div>
               <small style="display:block; margin-top:4px; opacity:0.85;">OTs Anuladas: <span id="stripOtsAnuladas">0</span></small>
@@ -666,10 +698,15 @@
             <button class="btn-switch" id="swReal" onclick="setVistaFiltro('REAL')">🟢 Solo Facturados / Cobrados</button>
             <button class="btn-switch" id="swProy" onclick="setVistaFiltro('PROY')">🟡 Solo Pendientes / Proyección</button>
             <button class="btn-switch" id="swAnul" onclick="setVistaFiltro('ANUL')">🚫 Solo Anulados</button>
+            
+            <!-- BOTÓN PARA DESCARGAR REPORTE PDF DEL MÓDULO 3 -->
+            <button onclick="descargarPDFReporte()" class="btn-pdf">
+              📄 Descargar Reporte PDF
+            </button>
           </div>
 
           <div class="table-responsive">
-            <table>
+            <table id="tablaGeneralReporte">
               <thead>
                 <tr>
                   <th>Fecha</th><th>Cotización</th><th>RUC</th><th>Cliente / Razón Social</th>
@@ -680,6 +717,15 @@
               <tbody id="tablaCuerpo">
                 <tr><td colspan="9" style="text-align: center;">Cargando base de datos...</td></tr>
               </tbody>
+              <!-- FILA DE TOTALES DINÁMICOS AL PIE DE LA TABLA DEL MÓDULO 3 -->
+              <tfoot>
+                <tr>
+                  <td colspan="6" style="text-align: right; text-transform: uppercase;">Total Filtrado:</td>
+                  <td id="totalFiltradoSoles" style="text-align: right;">S/ 0.00</td>
+                  <td id="totalFiltradoDolares" style="text-align: right;">$ 0.00</td>
+                  <td></td>
+                </tr>
+              </tfoot>
             </table>
           </div>
         </div>
@@ -690,7 +736,7 @@
           <div class="filter-header">
             <h2 style="margin: 0; color: var(--primary-dark);">📊 Resumen Ejecutivo Comercial por Cliente</h2>
 
-            <div class="filter-controls">
+            <div class="filter-controls" style="width: 100%;">
               <label style="font-weight: bold; font-size: 0.88rem; color: var(--primary-dark);">Mes Comercial:</label>
               <select id="filtroMesComercial" class="select-month" onchange="aplicarFiltrosComercial()">
                 <option value="TODOS">📅 Todo el Año 2026</option>
@@ -700,11 +746,16 @@
                 <option value="9">Octubre</option><option value="10">Noviembre</option><option value="11">Diciembre</option>
               </select>
               <input type="text" id="buscarCliente" class="search-input" placeholder="🔍 Filtrar por Cliente o RUC..." onkeyup="filtrarClientesTabla()">
+              
+              <!-- BOTÓN ALINEADO EXACTAMENTE A LA DERECHA -->
+              <button onclick="descargarPDFComercial()" class="btn-pdf" style="margin-left: auto;">
+                📄 Descargar PDF Comercial
+              </button>
             </div>
           </div>
 
           <div class="table-responsive">
-            <table>
+            <table id="tablaResumenClientesReporte">
               <thead>
                 <tr>
                   <th>Cliente / Razón Social</th>
@@ -718,6 +769,17 @@
               <tbody id="tablaResumenClientes">
                 <tr><td colspan="6" style="text-align: center;">Cargando reporte...</td></tr>
               </tbody>
+              <!-- FILA DE TOTALES DINÁMICOS AL PIE DEL MÓDULO 4 -->
+              <tfoot>
+                <tr>
+                  <td style="text-align: right; text-transform: uppercase;">Total Acumulado:</td>
+                  <td id="totalComercialCount" style="text-align: center;">0</td>
+                  <td id="totalComercialSoles" style="text-align: right;">S/ 0.00</td>
+                  <td id="totalComercialSolesIgv" style="text-align: right;">S/ 0.00</td>
+                  <td id="totalComercialDolares" style="text-align: right;">$ 0.00</td>
+                  <td id="totalComercialDolaresIgv" style="text-align: right;">$ 0.00</td>
+                </tr>
+              </tfoot>
             </table>
           </div>
         </div>
@@ -735,6 +797,10 @@
       <span>Sistemas & Tecnologías de Información</span>
     </div>
   </footer>
+
+  <!-- LIBRERÍAS JSPDF PARA LA GENERACIÓN DE REPORTES PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwjqgvZ7XQpgjiSU4DhlnFzxqRJ9cjEaPIm-aq8lGOishsDcMOAZx_E9886DVoBjg/exec";
@@ -840,7 +906,7 @@
       const btn = document.getElementById('btnActualizarOT');
 
       if (!ot) {
-        alert("⚠️ Por favor ingresa el número de OT a actualizar (ej. 7314).");
+        alert("⚠️ Por favor ingresa el número de OT a actualizar (ej. 7313).");
         return;
       }
 
@@ -976,7 +1042,7 @@
       filtrarTablaGeneral();
     }
 
-    // CÁLCULO FINANCIERO CON TOTALES DE PÉRDIDAS POR ANULACIÓN
+    // CÁLCULO FINANCIERO CON TOTALES DE PÉRDIDAS POR ANULACIÓN (MÓDULO 3)
     function aplicarFiltros() {
       const mesSeleccionado = document.getElementById('filtroMes').value;
       const tbody = document.getElementById('tablaCuerpo');
@@ -1008,12 +1074,10 @@
         const esFacturado = (estadoTexto.includes('Facturado') || estadoTexto.includes('Cobrado'));
 
         if (esAnulado) {
-          // SUMA A LA TARJETA DE PÉRDIDA POR ANULADO
           otsAnuladas++;
           anulSoles += soles;
           anulDolares += dolares;
         } else {
-          // SUMA A FACTURADO REAL O PROYECCIÓN
           otsActivas++;
           if (esFacturado) {
             realSoles += soles;
@@ -1058,7 +1122,6 @@
       document.getElementById('stripPotDolares').innerText = '$ ' + potDolares.toLocaleString('en-US', {minimumFractionDigits: 2}) + ' USD';
       document.getElementById('stripOtsActivas').innerText = otsActivas;
 
-      // VALORES DE LA TARJETA DE ANULADOS / PÉRDIDAS
       document.getElementById('stripAnulSoles').innerText = 'S/ ' + anulSoles.toLocaleString('es-PE', {minimumFractionDigits: 2});
       document.getElementById('stripAnulDolares').innerText = '$ ' + anulDolares.toLocaleString('en-US', {minimumFractionDigits: 2}) + ' USD';
       document.getElementById('stripOtsAnuladas').innerText = otsAnuladas;
@@ -1066,6 +1129,7 @@
       filtrarTablaGeneral();
     }
 
+    // CÁLCULO COMERCIAL Y TABLA (MÓDULO 4)
     function aplicarFiltrosComercial() {
       const mesSeleccionado = document.getElementById('filtroMesComercial').value;
       let clientesMap = {};
@@ -1107,6 +1171,11 @@
 
       if(lista.length === 0) {
         tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No hay registros activos en este período.</td></tr>';
+        document.getElementById('totalComercialCount').innerText = '0';
+        document.getElementById('totalComercialSoles').innerText = 'S/ 0.00';
+        document.getElementById('totalComercialSolesIgv').innerText = 'S/ 0.00';
+        document.getElementById('totalComercialDolares').innerText = '$ 0.00';
+        document.getElementById('totalComercialDolaresIgv').innerText = '$ 0.00';
         return;
       }
 
@@ -1129,18 +1198,42 @@
       });
     }
 
+    // FILTRAR Y SUMAR MÓDULO 4 (EN TIEMPO REAL AL BUSCAR)
     function filtrarClientesTabla() {
       const q = document.getElementById('buscarCliente').value.toLowerCase();
       const filas = document.querySelectorAll('.fila-cliente');
+
+      let totCount = 0;
+      let totSoles = 0;
+      let totDolares = 0;
+
       filas.forEach(f => {
         const texto = f.innerText.toLowerCase();
-        f.style.display = texto.includes(q) ? '' : 'none';
+        if (texto.includes(q)) {
+          f.style.display = '';
+          totCount += parseInt(f.dataset.count) || 0;
+          totSoles += parseFloat(f.dataset.soles) || 0;
+          totDolares += parseFloat(f.dataset.dolares) || 0;
+        } else {
+          f.style.display = 'none';
+        }
       });
+
+      // Actualizar pie de tabla en el Módulo 4
+      document.getElementById('totalComercialCount').innerText = totCount;
+      document.getElementById('totalComercialSoles').innerText = 'S/ ' + totSoles.toLocaleString('es-PE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      document.getElementById('totalComercialSolesIgv').innerText = 'S/ ' + (totSoles * 1.18).toLocaleString('es-PE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      document.getElementById('totalComercialDolares').innerText = '$ ' + totDolares.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      document.getElementById('totalComercialDolaresIgv').innerText = '$ ' + (totDolares * 1.18).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
     }
 
+    // FILTRADO DE TABLA Y RECALCULO DE SUMAS DEL PIE DE PÁGINA (MÓDULO 3)
     function filtrarTablaGeneral() {
       const q = document.getElementById('buscarGeneral').value.toLowerCase();
       const filas = document.querySelectorAll('.fila-general');
+
+      let sumaSoles = 0;
+      let sumaDolares = 0;
 
       filas.forEach(f => {
         const texto = f.innerText.toLowerCase();
@@ -1154,10 +1247,120 @@
 
         if (texto.includes(q) && cumpleSwitch) {
           f.style.display = '';
+          sumaSoles += parseFloat(f.dataset.soles) || 0;
+          sumaDolares += parseFloat(f.dataset.dolares) || 0;
         } else {
           f.style.display = 'none';
         }
       });
+
+      // Actualizar pie de tabla en la vista web del Módulo 3
+      document.getElementById('totalFiltradoSoles').innerText = 'S/ ' + sumaSoles.toLocaleString('es-PE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      document.getElementById('totalFiltradoDolares').innerText = '$ ' + sumaDolares.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    }
+
+    // DESCARGAR REPORTE EN PDF (MÓDULO 3)
+    function descargarPDFReporte() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF('landscape');
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(16);
+      doc.setTextColor(13, 56, 128);
+      doc.text("INRELSA — Centro de Control y Logistica", 14, 15);
+
+      const mesSelect = document.getElementById('filtroMes');
+      let mesTexto = mesSelect.options[mesSelect.selectedIndex].text;
+      mesTexto = mesTexto.replace(/[^\w\s\dÁÉÍÓÚáéíóúÑñ]/gi, '').trim(); 
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.setTextColor(100);
+      doc.text(`Reporte General de Ordenes | Filtro: ${mesTexto}`, 14, 22);
+
+      const fechaHoy = new Date().toLocaleDateString('es-PE');
+      doc.setFontSize(9);
+      doc.setTextColor(120);
+      doc.text(`Emision: ${fechaHoy}`, 250, 15);
+
+      doc.autoTable({
+        html: '#tablaGeneralReporte',
+        startY: 28,
+        theme: 'grid',
+        styles: {
+          fontSize: 7.5,
+          cellPadding: 2.5,
+          valign: 'middle'
+        },
+        headStyles: {
+          fillColor: [13, 56, 128],
+          textColor: [255, 255, 255],
+          fontStyle: 'bold',
+          halign: 'center'
+        },
+        footStyles: {
+          fillColor: [13, 56, 128],
+          textColor: [255, 255, 255],
+          fontStyle: 'bold'
+        },
+        alternateRowStyles: {
+          fillColor: [248, 249, 250]
+        }
+      });
+
+      doc.save(`Reporte_INRELSA_Ordenes_${new Date().toISOString().slice(0, 10)}.pdf`);
+    }
+
+    // DESCARGAR REPORTE EN PDF (MÓDULO 4 - RESUMEN COMERCIAL)
+    function descargarPDFComercial() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF('landscape');
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(16);
+      doc.setTextColor(13, 56, 128);
+      doc.text("INRELSA — Resumen Ejecutivo Comercial", 14, 15);
+
+      const mesSelect = document.getElementById('filtroMesComercial');
+      let mesTexto = mesSelect.options[mesSelect.selectedIndex].text;
+      mesTexto = mesTexto.replace(/[^\w\s\dÁÉÍÓÚáéíóúÑñ]/gi, '').trim(); 
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.setTextColor(100);
+      doc.text(`Ventas por Cliente | Filtro: ${mesTexto}`, 14, 22);
+
+      const fechaHoy = new Date().toLocaleDateString('es-PE');
+      doc.setFontSize(9);
+      doc.setTextColor(120);
+      doc.text(`Emision: ${fechaHoy}`, 250, 15);
+
+      doc.autoTable({
+        html: '#tablaResumenClientesReporte',
+        startY: 28,
+        theme: 'grid',
+        styles: {
+          fontSize: 8,
+          cellPadding: 3,
+          valign: 'middle'
+        },
+        headStyles: {
+          fillColor: [13, 56, 128],
+          textColor: [255, 255, 255],
+          fontStyle: 'bold',
+          halign: 'center'
+        },
+        footStyles: {
+          fillColor: [13, 56, 128],
+          textColor: [255, 255, 255],
+          fontStyle: 'bold'
+        },
+        alternateRowStyles: {
+          fillColor: [248, 249, 250]
+        }
+      });
+
+      doc.save(`Reporte_INRELSA_Comercial_${new Date().toISOString().slice(0, 10)}.pdf`);
     }
 
     function initInteractiveBackground() {
