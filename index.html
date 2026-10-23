@@ -889,8 +889,8 @@
               <thead>
                 <tr>
                   <th>Fecha</th><th>Cotización</th><th>RUC</th><th>Cliente / Razón Social</th>
-                  <th>OT</th><th>Descripción</th><th style="text-align: right;">Soles (S/.)</th>
-                  <th style="text-align: right;">Dólares ($)</th><th style="text-align: center;">Estado(s)</th>
+                  <th>OT</th><th>Descripción</th><th style="text-align: right;">Soles CON IGV (S/.)</th>
+                  <th style="text-align: right;">Dólares CON IGV ($)</th><th style="text-align: center;">Estado(s)</th>
                 </tr>
               </thead>
               <tbody id="tablaCuerpo">
@@ -898,7 +898,7 @@
               </tbody>
               <tfoot>
                 <tr>
-                  <td colspan="6" style="text-align: right; text-transform: uppercase;">Total Filtrado:</td>
+                  <td colspan="6" style="text-align: right; text-transform: uppercase;">Total Filtrado (Con IGV):</td>
                   <td id="totalFiltradoSoles" style="text-align: right;">S/ 0.00</td>
                   <td id="totalFiltradoDolares" style="text-align: right;">$ 0.00</td>
                   <td></td>
@@ -1261,8 +1261,13 @@
 
         const ruc = (fila[2] || '').toString().trim();
         const cliente = (fila[3] || 'S/N - Varios').trim();
-        const soles = limpiarMonto(fila[8]);
-        const dolares = limpiarMonto(fila[10]);
+        const solesBase = limpiarMonto(fila[8]);
+        const dolaresBase = limpiarMonto(fila[10]);
+
+        // Cálculo con IGV (18%)
+        const soles = solesBase * 1.18;
+        const dolares = dolaresBase * 1.18;
+
         const estadoTexto = (fila[12] || '').toString();
 
         const esAnulado = estadoTexto.includes('Anulado');
@@ -1297,27 +1302,27 @@
           <td><strong>${cliente}</strong></td>
           <td><strong>${fila[5] || '-'}</strong></td>
           <td>${fila[7] || '-'}</td>
-          <td style="text-align: right;">${soles > 0 ? 'S/ ' + soles.toLocaleString('es-PE', {minimumFractionDigits: 2}) : '-'}</td>
-          <td style="text-align: right;">${dolares > 0 ? '$ ' + dolares.toLocaleString('en-US', {minimumFractionDigits: 2}) : '-'}</td>
+          <td style="text-align: right;">${soles > 0 ? 'S/ ' + soles.toLocaleString('es-PE', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '-'}</td>
+          <td style="text-align: right;">${dolares > 0 ? '$ ' + dolares.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '-'}</td>
           <td style="text-align: center;">${renderBadges(estadoTexto)}</td>
         `;
         tbody.appendChild(tr);
       }
 
-      document.getElementById('stripRealSoles').innerText = 'S/ ' + realSoles.toLocaleString('es-PE', {minimumFractionDigits: 2});
-      document.getElementById('stripRealDolares').innerText = '$ ' + realDolares.toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('stripRealSoles').innerText = 'S/ ' + realSoles.toLocaleString('es-PE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      document.getElementById('stripRealDolares').innerText = '$ ' + realDolares.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
-      document.getElementById('stripProySoles').innerText = 'S/ ' + proySoles.toLocaleString('es-PE', {minimumFractionDigits: 2});
-      document.getElementById('stripProyDolares').innerText = '$ ' + proyDolares.toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('stripProySoles').innerText = 'S/ ' + proySoles.toLocaleString('es-PE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      document.getElementById('stripProyDolares').innerText = '$ ' + proyDolares.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
       const potSoles = realSoles + proySoles;
       const potDolares = realDolares + proyDolares;
-      document.getElementById('stripPotSoles').innerText = 'S/ ' + potSoles.toLocaleString('es-PE', {minimumFractionDigits: 2});
-      document.getElementById('stripPotDolares').innerText = '$ ' + potDolares.toLocaleString('en-US', {minimumFractionDigits: 2}) + ' USD';
+      document.getElementById('stripPotSoles').innerText = 'S/ ' + potSoles.toLocaleString('es-PE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      document.getElementById('stripPotDolares').innerText = '$ ' + potDolares.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' USD';
       document.getElementById('stripOtsActivas').innerText = otsActivas;
 
-      document.getElementById('stripAnulSoles').innerText = 'S/ ' + anulSoles.toLocaleString('es-PE', {minimumFractionDigits: 2});
-      document.getElementById('stripAnulDolares').innerText = '$ ' + anulDolares.toLocaleString('en-US', {minimumFractionDigits: 2}) + ' USD';
+      document.getElementById('stripAnulSoles').innerText = 'S/ ' + anulSoles.toLocaleString('es-PE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      document.getElementById('stripAnulDolares').innerText = '$ ' + anulDolares.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' USD';
       document.getElementById('stripOtsAnuladas').innerText = otsAnuladas;
 
       filtrarTablaGeneral();
